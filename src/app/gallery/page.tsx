@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { ChevronLeft, ChevronRight, X, Home, Info, MapPin, Phone } from 'lucide-react';
 
+type KontrakanType = "K1" | "K2";
+
 const galleries = {
   K1: [
     { id: 1, title: "Tampak Depan", description: "Fasad modern dengan taman kecil di depan", path: "/k1/k1.jpg" },
@@ -46,7 +48,7 @@ const kontrakanInfo = {
 
 export default function GalleryPage() {
   const router = useRouter();
-  const [selected, setSelected] = useState<keyof typeof galleries>("K1");
+  const [selected, setSelected] = useState<KontrakanType>("K1");
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -98,18 +100,18 @@ export default function GalleryPage() {
         </div>
 
         {/* Tombol Pilih Kontrakan */}
-        <div className={`flex justify-center gap-3 mb-8 transition-all duration-1000 delay-200 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
-          {["K1", "K2"].map((k) => (
+        <div className={`flex flex-wrap justify-center gap-4 mb-8 transition-all duration-1000 delay-200 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
+          {(["K1", "K2"] as const).map((k) => (
             <button
               key={k}
               onClick={() => setSelected(k)}
-              className={`px-4 md:px-8 py-2 md:py-3 rounded-full font-semibold text-sm md:text-base transition-all transform hover:scale-105 flex items-center ${
+              className={`px-5 md:px-8 py-3 md:py-4 rounded-full font-semibold text-sm md:text-base transition-all transform hover:scale-105 flex items-center ${
                 selected === k
                   ? "bg-blue-600 text-white shadow-lg"
-                  : "bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 shadow"
+                  : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700 shadow"
               }`}
             >
-              <Home className="w-4 h-4 md:w-5 md:h-5 mr-1 md:mr-2" />
+              <Home className="w-5 h-5 md:w-6 md:h-6 mr-2" />
               Kontrakan {k}
             </button>
           ))}
@@ -117,61 +119,61 @@ export default function GalleryPage() {
 
         {/* Info Panel */}
         <div className={`bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-4 md:p-6 mb-8 transition-all duration-1000 delay-300 ${isLoaded ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}>
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
+          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center mb-4 gap-2">
             <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-white flex items-center">
-            <Info className="w-4 h-4 md:w-5 md:h-5 mr-2 text-blue-600" />
-            {kontrakanInfo[selected].title}
+              <Info className="w-4 h-4 md:w-5 md:h-5 mr-2 text-blue-600" />
+              {kontrakanInfo[selected].title}
             </h2>
             <div className="bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 font-medium px-3 py-1 rounded-full text-sm md:text-base w-fit">
-            {kontrakanInfo[selected].price}
+              {kontrakanInfo[selected].price}
             </div>
-        </div>
-        <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base mb-4">
+          </div>
+          <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base mb-4">
             {kontrakanInfo[selected].description}
-        </p>
-        <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 text-sm md:text-base">
+          </p>
+          <ul className="list-disc list-inside text-gray-600 dark:text-gray-300 text-sm md:text-base">
             {kontrakanInfo[selected].features.map((feature, index) => (
-            <li key={index}>{feature}</li>
+              <li key={index}>{feature}</li>
             ))}
-        </ul>
-        <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base mt-4">
+          </ul>
+          <p className="text-gray-600 dark:text-gray-300 text-sm md:text-base mt-4">
             <strong>Lokasi:</strong> {kontrakanInfo[selected].location}
-        </p>
-        <p className={`text-sm md:text-base mt-2 font-semibold ${kontrakanInfo[selected].status === "Kosong" ? "text-green-600" : "text-red-600"}`}>
+          </p>
+          <p className={`text-sm md:text-base mt-2 font-semibold ${kontrakanInfo[selected].status === "Kosong" ? "text-green-600" : "text-red-600"}`}>
             Status: {kontrakanInfo[selected].status}
-        </p>
+          </p>
         </div>
 
         {/* Galeri Foto */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-            {galleries[selected].map((item, index) => (
-                <div
-                key={item.id}
-                className="group relative overflow-hidden rounded-xl md:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105 cursor-pointer"
-                onClick={() => openLightbox(index)}
-                >
-                <div className="aspect-[4/3] relative">
-                    {item.path.endsWith(".mp4") ? (
-                    <video src={item.path} className="w-full h-full object-cover" muted autoPlay loop />
-                    ) : (
-                    <div
-                        style={{
-                        backgroundImage: `url('${item.path}')`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                        width: "100%",
-                        height: "100%",
-                        }}
-                    />
-                    )}
-                </div>
-                {/* Title and Description */}
-                <div className="absolute bottom-0 left-0 w-full bg-black/70 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    <h3 className="text-sm font-bold">{item.title}</h3>
-                    <p className="text-xs">{item.description}</p>
-                </div>
-                </div>
-            ))}
+          {galleries[selected].map((item, index) => (
+            <div
+              key={item.id}
+              className="group relative overflow-hidden rounded-xl md:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-500 transform hover:scale-105 cursor-pointer"
+              onClick={() => openLightbox(index)}
+            >
+              <div className="aspect-[4/3] relative">
+                {item.path.endsWith(".mp4") ? (
+                  <video src={item.path} className="w-full h-full object-cover" muted autoPlay loop />
+                ) : (
+                  <div
+                    style={{
+                      backgroundImage: `url('${item.path}')`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                      width: "100%",
+                      height: "100%",
+                    }}
+                  />
+                )}
+              </div>
+              {/* Title and Description */}
+              <div className="absolute bottom-0 left-0 w-full bg-black/70 text-white p-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                <h3 className="text-sm font-bold">{item.title}</h3>
+                <p className="text-xs">{item.description}</p>
+              </div>
+            </div>
+          ))}
         </div>
 
         {/* Lightbox */}
@@ -218,14 +220,19 @@ export default function GalleryPage() {
           </div>
         )}
 
-        {/* Tombol Kembali ke Menu Utama */}
-        <div className="mt-8 flex justify-center">
+        {/* Tombol Kembali ke Menu Utama dengan Animasi */}
+        <div className="mt-12 flex justify-center">
           <button
             onClick={() => router.push("/")}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold shadow-lg text-sm md:text-base flex items-center justify-center transition-all transform hover:scale-105"
+            className="group relative bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white px-8 py-4 rounded-xl font-bold shadow-lg transition-all duration-300 flex items-center justify-center overflow-hidden"
           >
-            <Home className="w-5 h-5 mr-2" />
-            Kembali ke Menu Utama
+            <div className="absolute -left-4 w-16 h-16 rounded-full bg-blue-400 bg-opacity-30 transition-all duration-300 transform group-hover:scale-150"></div>
+            <div className="absolute right-0 bottom-0 w-12 h-12 rounded-tl-full bg-blue-800 bg-opacity-20"></div>
+            <span className="relative flex items-center gap-3 z-10">
+              <Home className="w-5 h-5 md:w-6 md:h-6 group-hover:animate-pulse" />
+              <span className="text-sm md:text-base">Kembali ke Menu Utama</span>
+              <ChevronLeft className="w-5 h-5 transition-transform duration-300 group-hover:-translate-x-1" />
+            </span>
           </button>
         </div>
       </div>
